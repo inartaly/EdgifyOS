@@ -14,7 +14,7 @@ set -e
 
 EDGIFY_USER="edgify"
 EDGE_CHANNEL="stable"
-UBUNTU_CODENAME="jammy"
+UBUNTU_CODENAME="focal"
 HOME_URL="https://www.bing.com"
 BACKUP_DIR="/var/lib/edgifyos-backup"
 
