@@ -2,13 +2,13 @@
 set -e
 
 # ============================================================
-#  EdgifyOS Interactive Installer / Uninstaller
-#  Ubuntu 22.04 → Edge‑centric kiosk environment (Flatpak Edge)
+#  EdgifyOS Installer / Uninstaller
+#  Ubuntu 22.04 → ChromeOS‑like interface using Flatpak Edge
 #
-#  Install directly:
+#  Direct install:
 #     curl -fsSL https://raw.githubusercontent.com/inartaly/EdgifyOS/main/edgify-bootstrap.sh | sudo bash -s install
 #
-#  Uninstall directly:
+#  Direct uninstall:
 #     curl -fsSL https://raw.githubusercontent.com/inartaly/EdgifyOS/main/edgify-bootstrap.sh | sudo bash -s revert
 #
 #  Interactive:
@@ -31,13 +31,9 @@ install_edgifyos() {
 
     mkdir -p "$BACKUP_DIR"
 
-    if [ -f /etc/lightdm/lightdm.conf ]; then
-        cp /etc/lightdm/lightdm.conf "$BACKUP_DIR/lightdm.conf.bak"
-    fi
-
-    if [ -f /usr/share/xsessions/openbox.desktop ]; then
-        cp /usr/share/xsessions/openbox.desktop "$BACKUP_DIR/openbox.desktop.bak"
-    fi
+    # Backup configs
+    [ -f /etc/lightdm/lightdm.conf ] && cp /etc/lightdm/lightdm.conf "$BACKUP_DIR/lightdm.conf.bak"
+    [ -f /usr/share/xsessions/openbox.desktop ] && cp /usr/share/xsessions/openbox.desktop "$BACKUP_DIR/openbox.desktop.bak"
 
     echo "[EdgifyOS] Updating system..."
     apt update
@@ -48,6 +44,10 @@ install_edgifyos() {
         xorg lightdm openbox tint2 flatpak \
         software-properties-common apt-transport-https curl ca-certificates \
         fonts-dejavu-core
+
+    echo "[EdgifyOS] Setting LightDM as the default display manager..."
+    echo "/usr/sbin/lightdm" > /etc/X11/default-display-manager
+    DEBIAN_FRONTEND=noninteractive dpkg-reconfigure lightdm
 
     echo "[EdgifyOS] Adding Flathub (if missing)..."
     if ! flatpak remote-list | grep -q flathub; then
@@ -90,7 +90,7 @@ EOF
     cat >"${EDGIFY_HOME}/.config/openbox/autostart" <<EOF
 tint2 &
 sleep 2
-flatpak run com.microsoft.Edge --start-fullscreen --no-first-run "${HOME_URL}" &
+flatpak run com.microsoft.Edge --start-maximized --no-first-run "${HOME_URL}" &
 EOF
 
     chown -R "${EDGIFY_USER}:${EDGIFY_USER}" "${EDGIFY_HOME}/.config"
@@ -122,17 +122,8 @@ uninstall_edgifyos() {
         exit 1
     fi
 
-    if [ -f "$BACKUP_DIR/lightdm.conf.bak" ]; then
-        cp "$BACKUP_DIR/lightdm.conf.bak" /etc/lightdm/lightdm.conf
-    else
-        rm -f /etc/lightdm/lightdm.conf
-    fi
-
-    if [ -f "$BACKUP_DIR/openbox.desktop.bak" ]; then
-        cp "$BACKUP_DIR/openbox.desktop.bak" /usr/share/xsessions/openbox.desktop
-    else
-        rm -f /usr/share/xsessions/openbox.desktop
-    fi
+    [ -f "$BACKUP_DIR/lightdm.conf.bak" ] && cp "$BACKUP_DIR/lightdm.conf.bak" /etc/lightdm/lightdm.conf || rm -f /etc/lightdm/lightdm.conf
+    [ -f "$BACKUP_DIR/openbox.desktop.bak" ] && cp "$BACKUP_DIR/openbox.desktop.bak" /usr/share/xsessions/openbox.desktop || rm -f /usr/share/xsessions/openbox.desktop
 
     EDGIFY_HOME=$(eval echo "~${EDGIFY_USER}")
     rm -rf "${EDGIFY_HOME}/.config/openbox" || true
