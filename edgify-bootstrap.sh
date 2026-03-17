@@ -15,6 +15,14 @@ set -e
 #     sudo bash edgify-bootstrap.sh
 # ============================================================
 
+# Ensure curl exists on fresh Ubuntu installs
+if ! command -v curl >/dev/null 2>&1; then
+    echo "[EdgifyOS] curl not found — installing..."
+    apt update
+    DEBIAN_FRONTEND=noninteractive apt install -y curl
+fi
+
+
 EDGIFY_USER="edgify"
 HOME_URL="https://www.bing.com"
 BACKUP_DIR="/var/lib/edgifyos-backup"
@@ -58,9 +66,15 @@ install_edgifyos() {
     flatpak install -y flathub com.microsoft.Edge
 
     if ! id "$EDGIFY_USER" >/dev/null 2>&1; then
-        echo "[EdgifyOS] Creating user '$EDGIFY_USER'..."
-        adduser --disabled-password --gecos "" "$EDGIFY_USER"
+    echo "[EdgifyOS] Creating user '$EDGIFY_USER'..."
+    adduser --disabled-password --gecos "" "$EDGIFY_USER"
+
+    echo ""
+    echo "[EdgifyOS] Please set a password for the 'edgify' user."
+    echo "This is required for sudo access inside the kiosk session."
+    passwd "$EDGIFY_USER"
     fi
+
 
     echo "[EdgifyOS] Configuring LightDM autologin..."
     mkdir -p /etc/lightdm
