@@ -46,3 +46,15 @@ Configure autologin + Openbox session
 Set up Tint2 and Edge autostart
 
 Reboot when finished.
+
+=========================================================
+
+Uninstall / Revert to Ubuntu
+To remove EdgifyOS and restore normal Ubuntu login:
+
+===
+
+curl -fsSL https://raw.githubusercontent.com/inartaly/EdgifyOS/main/edgify-bootstrap.sh | sudo bash -s revert
+
+===
+You’ll be asked whether to delete the edgify user.
