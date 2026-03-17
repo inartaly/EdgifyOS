@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
-set -e
-
-# EdgifyOS bootstrap for Ubuntu 22.04 (jammy)
-# Turns an existing Ubuntu install into an Edge-centric kiosk-like system.
+# EdgifyOS Bootstrap Script
+# Ubuntu 22.04 → Edge‑centric kiosk environment
 #
-# Usage (once hosted on GitHub, etc.):
-#   curl -fsSL https://raw.githubusercontent.com/inartaly/<repo>/main/edgify-bootstrap.sh | sudo bash
+# Install via:
+#   curl -fsSL https://raw.githubusercontent.com/inartaly/EdgifyOS/main/edgify-bootstrap.sh | sudo bash
+#
+# Repository:
+#   https://github.com/inartaly/EdgifyOS
+
 
 EDGIFY_USER="edgify"
 EDGE_CHANNEL="stable"   # stable / beta / dev
